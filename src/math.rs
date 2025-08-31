@@ -35,6 +35,16 @@ mod tests {
     }
 
     #[test]
+    fn test_create_negative_point() {
+        let point = Point::new(-2.3, -51.2);
+
+        assert_eq!(point.x, -2.3);
+        assert_eq!(point.y, -51.2);
+        assert!(point.x < 0.0);
+        assert!(point.y < 0.0);
+    }
+
+    #[test]
     fn test_create_zero_point() {
         let point = Point::zero();
 
