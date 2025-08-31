@@ -1,1 +1,24 @@
-/target
+# Rust
+/target/
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+
+# Documentation build
+/doc/
+
+# Coverage reports
+*.profraw
+tarpaulin-report.html

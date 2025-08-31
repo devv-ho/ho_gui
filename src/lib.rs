@@ -7,23 +7,23 @@
 
 pub mod app;
 pub mod math;
-pub mod color;
-pub mod widgets;
-pub mod layout;
-pub mod rendering;
-pub mod input;
-pub mod style;
+// pub mod color;
+// pub mod widgets;
+// pub mod layout;
+// pub mod rendering;
+// pub mod input;
+// pub mod style;
 
 // Re-export commonly used types
-pub use app::App;
-pub use math::{Point, Size, Rect, Vec2};
-pub use color::Color;
-pub use widgets::Widget;
+// pub use app::App;
+// pub use math::{Point, Size, Rect, Vec2};
+// pub use color::Color;
+// pub use widgets::Widget;
 
-/// Convenience prelude for common ho_gui types
-pub mod prelude {
-    pub use crate::{
-        App, Color, Point, Size, Rect, Vec2,
-        Widget,
-    };
-}
+// Convenience prelude for common ho_gui types
+// pub mod prelude {
+//     pub use crate::{
+//         App, Color, Point, Size, Rect, Vec2,
+//         Widget,
+//     };
+// }
