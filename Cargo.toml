@@ -1,0 +1,30 @@
+[package]
+name = "ho_gui"
+version = "0.1.0"
+edition = "2024"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+description = "An immediate-mode GUI library for Rust"
+repository = "https://github.com/yourusername/ho_gui"
+keywords = ["gui", "ui", "graphics", "desktop"]
+categories = ["gui"]
+
+[dependencies]
+winit = "0.29"
+wgpu = "0.19"
+tiny-skia = "0.11"
+fontdb = "0.16"
+rustybuzz = "0.12"
+glam = "0.25"
+
+[dev-dependencies]
+pollster = "0.3"
+
+[[example]]
+name = "hello_world"
+path = "examples/hello_world.rs"
+
+[features]
+default = ["wgpu-backend"]
+wgpu-backend = ["wgpu"]
+software-only = []
