@@ -111,7 +111,7 @@ impl DivAssign for Point {
     fn div_assign(&mut self, other: Self) {
         if other.x == 0.0 || other.y == 0.0 {
             panic!(
-                "Attempted to divide {:?} by {:?}. (division-ey-zero)",
+                "Attempted to divide {:?} by {:?}. (division-by-zero)",
                 *self, other
             );
         }
@@ -280,5 +280,23 @@ mod tests {
 
         assert_relative_eq!(point_1.x, x_1 / point_2.x, epsilon = 1e-6);
         assert_relative_eq!(point_1.y, y_1 / point_2.y, epsilon = 1e-6);
+    }
+
+    #[test]
+    #[should_panic(expected = "division-by-zero")]
+    fn test_division_by_zero_point() {
+        let point_1 = Point::new(1.3, 4.3);
+        let point_with_zero = Point::new(0.0, 4.3);
+
+        let _ = point_1 / point_with_zero;
+    }
+
+    #[test]
+    #[should_panic(expected = "division-by-zero")]
+    fn test_div_assign_by_zero() {
+        let mut point_1 = Point::new(1.0, 2.0);
+        let point_with_zero = Point::new(1.0, 0.0);
+
+        point_1 /= point_with_zero;
     }
 }
