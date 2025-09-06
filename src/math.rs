@@ -160,6 +160,7 @@ impl Size {
 }
 
 /// Rectangle with position and size
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Rect {
     /// Position of top-left point of a rectangle
     pub pos: Point,
@@ -231,6 +232,8 @@ impl Rect {
         self.size.area()
     }
 }
+
+pub type Vec2 = Point;
 
 #[cfg(test)]
 mod tests {
