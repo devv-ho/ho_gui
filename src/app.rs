@@ -12,7 +12,7 @@ impl App {
             // TODO: Initialize app state
         }
     }
-    
+
     /// Run the main application event loop
     pub fn run(self) -> Result<(), Box<dyn std::error::Error>> {
         // TODO: Implement event loop

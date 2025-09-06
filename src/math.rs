@@ -121,6 +121,43 @@ impl DivAssign for Point {
     }
 }
 
+/// Size for rectangle
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Size {
+    /// width of a rectangle
+    pub width: f32,
+
+    /// height of a rectangle
+    pub height: f32,
+}
+
+impl Size {
+    /// Create new Size with specified width and height
+    pub const fn new(width: f32, height: f32) -> Self {
+        Self { width, height }
+    }
+
+    /// Create new Size with zero width and height
+    pub const fn zero() -> Self {
+        Self::new(0.0, 0.0)
+    }
+
+    /// Check if width and height is not negative
+    pub fn is_valid(&self) -> bool {
+        self.width >= 0.0 && self.height >= 0.0
+    }
+
+    /// Check if width and height is positive
+    pub fn is_positive(&self) -> bool {
+        self.width > 0.0 && self.height > 0.0
+    }
+
+    /// Calculate area of a Size
+    pub fn area(&self) -> f32 {
+        self.width * self.height
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -298,5 +335,65 @@ mod tests {
         let point_with_zero = Point::new(1.0, 0.0);
 
         point_1 /= point_with_zero;
+    }
+
+    #[test]
+    fn test_new_size() {
+        let width = 1.3;
+        let height = 3.5;
+
+        let size = Size::new(width, height);
+
+        assert_relative_eq!(width, size.width, epsilon = 1e-6);
+        assert_relative_eq!(height, size.height, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn test_zero_size() {
+        let zero_size = Size::zero();
+
+        assert_relative_eq!(zero_size.width, 0.0, epsilon = 1e-6);
+        assert_relative_eq!(zero_size.height, 0.0, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn test_valid_size() {
+        let width = 0.0;
+        let height = 2.5;
+
+        let valid_size = Size::new(width, height);
+
+        assert!(valid_size.is_valid());
+    }
+
+    #[test]
+    fn test_invalid_size() {
+        let width = 0.0;
+        let height = -1.2;
+
+        let invalid_size = Size::new(width, height);
+
+        assert!(!invalid_size.is_valid());
+    }
+
+    #[test]
+    fn test_zero_size_validity() {
+        let zero_size = Size::zero();
+
+        assert!(zero_size.is_valid());
+    }
+
+    #[test]
+    fn test_positive_size_is_positive() {
+        let positive_size = Size::new(1.65, 34.1);
+
+        assert!(positive_size.is_positive());
+    }
+
+    #[test]
+    fn test_zero_size_is_positive() {
+        let zero_size = Size::zero();
+
+        assert!(!zero_size.is_positive());
     }
 }
