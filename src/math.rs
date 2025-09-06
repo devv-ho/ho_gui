@@ -91,10 +91,7 @@ impl Div for Point {
     /// Panics when value of other's x or y is zero
     fn div(self, other: Self) -> Self::Output {
         if other.x == 0.0 || other.y == 0.0 {
-            panic!(
-                "Attempted to divide {:?} by {:?}. (division-by-zero)",
-                self, other
-            );
+            panic!("Attempted to divide {self:?} by {other:?}. (division-by-zero)");
         }
 
         Self {
@@ -154,7 +151,84 @@ impl Size {
 
     /// Calculate area of a Size
     pub fn area(&self) -> f32 {
+        if !self.is_valid() {
+            panic!("Attempted to get area of an invalid size. (invalid-argument)");
+        }
+
         self.width * self.height
+    }
+}
+
+/// Rectagle with position and size
+pub struct Rect {
+    /// Position of top-left point of a rectangle
+    pub pos: Point,
+
+    /// Size of a rectangle
+    pub size: Size,
+}
+
+impl Rect {
+    /// Create a rectangle with specified position and size
+    pub const fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
+        Self {
+            pos: Point::new(x, y),
+            size: Size::new(width, height),
+        }
+    }
+
+    /// Create a rectagle positioned on zero point and with zero size
+    pub const fn zero() -> Self {
+        Self {
+            pos: Point::zero(),
+            size: Size::zero(),
+        }
+    }
+
+    /// Get x cooridinate of left edge
+    pub fn left(&self) -> f32 {
+        self.pos.x
+    }
+
+    /// Get x coordinate of right edge
+    pub fn right(&self) -> f32 {
+        self.pos.x + self.size.width
+    }
+
+    /// Get y coordinate of top edge
+    pub fn top(&self) -> f32 {
+        self.pos.y
+    }
+
+    /// Get y coordinate of bottom edge
+    pub fn bottom(&self) -> f32 {
+        self.pos.y + self.size.height
+    }
+
+    /// Check if rectangle contains a point.
+    ///
+    /// NOTE: returns true if point is on the edge
+    pub fn contains_point(&self, point: Point) -> bool {
+        point.x >= self.left()
+            && point.x <= self.right()
+            && point.y <= self.bottom()
+            && point.y >= self.top()
+    }
+
+    /// Check if rectangle intersects other rectangle
+    ///
+    /// NOTE: return true if rectangle are touching each other, and smaller rect returns true if it
+    /// is located inside of bigger rect
+    pub fn intersects(&self, other: Self) -> bool {
+        self.left() <= other.right()
+            && self.right() >= other.left()
+            && self.top() <= other.bottom()
+            && self.bottom() >= other.top()
+    }
+
+    /// Get area of a rectangle
+    pub fn area(&self) -> f32 {
+        self.size.area()
     }
 }
 
@@ -275,7 +349,6 @@ mod tests {
     fn test_mul_two_points() {
         let point_1 = Point::new(-1.0, 3.5);
         let point_2 = Point::new(-2.3, -5.2);
-
         let multiplied_point = point_1 * point_2;
 
         assert_relative_eq!(multiplied_point.x, point_1.x * point_2.x, epsilon = 1e-6);
@@ -395,5 +468,178 @@ mod tests {
         let zero_size = Size::zero();
 
         assert!(!zero_size.is_positive());
+    }
+
+    #[test]
+    fn test_get_area_of_valid_size() {
+        let size = Size::new(23.0, 3.0);
+
+        assert_eq!(size.area(), size.width * size.height);
+    }
+
+    #[test]
+    #[should_panic(expected = "Attempted to get area of an invalid size. (invalid-argument)")]
+    fn test_get_area_of_invalid_size() {
+        let invalid_size = Size::new(-1.0, 4.0);
+
+        let _ = invalid_size.area();
+    }
+
+    #[test]
+    fn test_rect_creation() {
+        let pos = Point::new(1.5, 2.3);
+        let size = Size::new(10.3, 35.1);
+
+        let rect = Rect::new(pos.x, pos.y, size.width, size.height);
+
+        assert_relative_eq!(rect.pos.x, pos.x, epsilon = 1e-6);
+        assert_relative_eq!(rect.pos.y, pos.y, epsilon = 1e-6);
+        assert_relative_eq!(rect.size.width, size.width, epsilon = 1e-6);
+        assert_relative_eq!(rect.size.height, size.height, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn test_zero_rect_creation() {
+        let zero_rect = Rect::zero();
+
+        assert_relative_eq!(zero_rect.pos.x, 0.0, epsilon = 1e-6);
+        assert_relative_eq!(zero_rect.pos.y, 0.0, epsilon = 1e-6);
+        assert_relative_eq!(zero_rect.size.width, 0.0, epsilon = 1e-6);
+        assert_relative_eq!(zero_rect.size.height, 0.0, epsilon = 1e-6);
+    }
+
+    #[test]
+    fn test_left_of_rect() {
+        let pos = Point::new(-1.23, 23.41);
+        let size = Size::new(10.23, 21.4);
+
+        let rect = Rect::new(pos.x, pos.y, size.width, size.height);
+
+        assert_relative_eq!(rect.left(), pos.x);
+    }
+
+    #[test]
+    fn test_right_of_rect() {
+        let pos = Point::new(-1.23, 23.41);
+        let size = Size::new(10.23, 21.4);
+
+        let rect = Rect::new(pos.x, pos.y, size.width, size.height);
+
+        assert_relative_eq!(rect.right(), pos.x + size.width);
+    }
+
+    #[test]
+    fn test_top_of_rect() {
+        let pos = Point::new(-1.23, 23.41);
+        let size = Size::new(10.23, 21.4);
+
+        let rect = Rect::new(pos.x, pos.y, size.width, size.height);
+
+        assert_relative_eq!(rect.top(), pos.y);
+    }
+
+    #[test]
+    fn test_bottom_of_rect() {
+        let pos = Point::new(-1.23, 23.41);
+        let size = Size::new(10.23, 21.4);
+
+        let rect = Rect::new(pos.x, pos.y, size.width, size.height);
+
+        assert_relative_eq!(rect.bottom(), pos.y + size.height);
+    }
+
+    #[test]
+    fn test_rect_not_contains_point_outside() {
+        let rect = Rect::new(0.0, 0.0, 10.3, 175.3);
+        let point_out_of_rect = Point::new(-1.0, -2.3);
+
+        assert_eq!(rect.contains_point(point_out_of_rect), false);
+    }
+
+    #[test]
+    fn test_rect_constains_point_on_edge() {
+        let rect = Rect::new(0.0, 0.0, 10.3, 175.3);
+
+        let point_on_left_edge = Point::new(0.0, 50.3);
+        let point_on_right_edge = Point::new(10.3, 23.5);
+        let point_on_top_edge = Point::new(5.3, 0.0);
+        let point_on_bottom_edge = Point::new(4.1, 175.3);
+
+        assert_eq!(rect.contains_point(point_on_left_edge), true);
+        assert_eq!(rect.contains_point(point_on_right_edge), true);
+        assert_eq!(rect.contains_point(point_on_top_edge), true);
+        assert_eq!(rect.contains_point(point_on_bottom_edge), true);
+    }
+
+    #[test]
+    fn test_rect_contains_point_inside() {
+        let rect = Rect::new(0.0, 0.0, 10.3, 175.3);
+
+        let point_inside_rect = Point::new(4.6, 36.3);
+
+        assert_eq!(rect.contains_point(point_inside_rect), true);
+    }
+
+    #[test]
+    fn test_rect_not_intersects() {
+        let rect_1 = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let rect_2 = Rect::new(20.0, 20.0, 10.0, 10.0);
+
+        assert_eq!(rect_1.intersects(rect_2), false);
+    }
+
+    #[test]
+    fn test_rect_intersects_touched_rect() {
+        let rect = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let rect_touch_left = Rect::new(-5.0, 2.0, 5.0, 5.0);
+        let rect_touch_right = Rect::new(10.0, 2.0, 5.0, 5.0);
+        let rect_touch_top = Rect::new(2.0, -5.0, 5.0, 5.0);
+        let rect_touch_bottom = Rect::new(2.0, 10.0, 5.0, 5.0);
+
+        assert_eq!(rect.intersects(rect_touch_left), true);
+        assert_eq!(rect.intersects(rect_touch_right), true);
+        assert_eq!(rect.intersects(rect_touch_top), true);
+        assert_eq!(rect.intersects(rect_touch_bottom), true);
+    }
+
+    #[test]
+    fn test_rect_intersects_crossed_rect() {
+        let rect = Rect::new(0.0, 0.0, 10.0, 10.0);
+        let rect_crossed_left = Rect::new(-5.0, 2.0, 8.0, 5.0);
+        let rect_crossed_right = Rect::new(8.0, 2.0, 5.0, 5.0);
+        let rect_crossed_top = Rect::new(2.0, -5.0, 5.0, 8.0);
+        let rect_crossed_bottom = Rect::new(2.0, 8.0, 5.0, 5.0);
+
+        assert_eq!(rect.intersects(rect_crossed_left), true);
+        assert_eq!(rect.intersects(rect_crossed_right), true);
+        assert_eq!(rect.intersects(rect_crossed_top), true);
+        assert_eq!(rect.intersects(rect_crossed_bottom), true);
+    }
+
+    #[test]
+    fn test_bigger_rect_intersects_smaller_rect() {
+        let smaller_rect = Rect::new(2.0, 2.0, 2.0, 2.0);
+        let bigger_rect = Rect::new(0.0, 0.0, 10.0, 10.0);
+
+        assert_eq!(bigger_rect.intersects(smaller_rect), true);
+    }
+
+    #[test]
+    fn test_smallerer_rect_intersects_bigger_rect() {
+        let smaller_rect = Rect::new(2.0, 2.0, 2.0, 2.0);
+        let bigger_rect = Rect::new(0.0, 0.0, 10.0, 10.0);
+
+        assert_eq!(smaller_rect.intersects(bigger_rect), true);
+    }
+
+    #[test]
+    fn test_area_of_rect() {
+        let rect = Rect::new(0.0, 0.0, 10.0, 23.0);
+
+        assert_relative_eq!(
+            rect.area(),
+            rect.size.width * rect.size.height,
+            epsilon = 1e-6
+        );
     }
 }
