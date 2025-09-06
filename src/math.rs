@@ -159,7 +159,7 @@ impl Size {
     }
 }
 
-/// Rectagle with position and size
+/// Rectangle with position and size
 pub struct Rect {
     /// Position of top-left point of a rectangle
     pub pos: Point,
@@ -177,7 +177,7 @@ impl Rect {
         }
     }
 
-    /// Create a rectagle positioned on zero point and with zero size
+    /// Create a rectangle positioned on zero point and with zero size
     pub const fn zero() -> Self {
         Self {
             pos: Point::zero(),
@@ -185,7 +185,7 @@ impl Rect {
         }
     }
 
-    /// Get x cooridinate of left edge
+    /// Get x coordinate of left edge
     pub fn left(&self) -> f32 {
         self.pos.x
     }
@@ -557,7 +557,7 @@ mod tests {
     }
 
     #[test]
-    fn test_rect_constains_point_on_edge() {
+    fn test_rect_contains_point_on_edge() {
         let rect = Rect::new(0.0, 0.0, 10.3, 175.3);
 
         let point_on_left_edge = Point::new(0.0, 50.3);
@@ -625,7 +625,7 @@ mod tests {
     }
 
     #[test]
-    fn test_smallerer_rect_intersects_bigger_rect() {
+    fn test_smaller_rect_intersects_bigger_rect() {
         let smaller_rect = Rect::new(2.0, 2.0, 2.0, 2.0);
         let bigger_rect = Rect::new(0.0, 0.0, 10.0, 10.0);
 
