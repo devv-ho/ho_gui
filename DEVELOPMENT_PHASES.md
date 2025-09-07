@@ -5,12 +5,12 @@
 
 ### 1.1 Project Setup
 - [x] **Task 1.1.1**: Initialize Cargo project with proper structure
-- [ ] **Task 1.1.2**: Configure Cargo.toml with core dependencies
-- [ ] **Task 1.1.3**: Set up CI/CD pipeline (GitHub Actions)
-- [ ] **Task 1.1.4**: Create basic documentation structure
+- [x] **Task 1.1.2**: Configure Cargo.toml with core dependencies
+- [x] **Task 1.1.3**: Set up CI/CD pipeline (GitHub Actions)
+- [x] **Task 1.1.4**: Create basic documentation structure
 
 ### 1.2 Core Abstractions
-- [ ] **Task 1.2.1**: Implement basic math types (Point, Size, Rect)
+- [x] **Task 1.2.1**: Implement basic math types (Point, Size, Rect)
 - [ ] **Task 1.2.2**: Create Color and Style types
 - [ ] **Task 1.2.3**: Design Widget trait and Response types
 - [ ] **Task 1.2.4**: Implement DrawContext and basic drawing primitives
