@@ -25,7 +25,10 @@ impl Point {
 
     /// Calculate Euclidean distance to given point
     pub fn distance_to(&self, other: &Self) -> f32 {
-        ((self.x - other.x).powi(2) + (self.y - other.y).powi(2)).sqrt()
+        let dist_x = self.x - other.x;
+        let dist_y = self.y - other.y;
+
+        (dist_x * dist_x + dist_y * dist_y).sqrt()
     }
 }
 
@@ -107,10 +110,7 @@ impl DivAssign for Point {
     /// Panics when value of other's x or y is zero
     fn div_assign(&mut self, other: Self) {
         if other.x == 0.0 || other.y == 0.0 {
-            panic!(
-                "Attempted to divide {:?} by {:?}. (division-by-zero)",
-                *self, other
-            );
+            panic!("Attempted to divide {self:?} by {other:?}. (division-by-zero)");
         }
 
         self.x /= other.x;
@@ -150,6 +150,9 @@ impl Size {
     }
 
     /// Calculate area of a Size
+    ///
+    /// # Panic
+    /// Panics when it has negative width or height
     pub fn area(&self) -> f32 {
         if !self.is_valid() {
             panic!("Attempted to get area of an invalid size. (invalid-argument)");
@@ -228,6 +231,9 @@ impl Rect {
     }
 
     /// Get area of a rectangle
+    ///
+    /// # Panic
+    /// Panics when it has negative width or height
     pub fn area(&self) -> f32 {
         self.size.area()
     }
@@ -241,6 +247,8 @@ mod tests {
     use super::*;
     use approx::assert_relative_eq;
 
+    const TEST_EPSILON: f32 = 1e-6;
+
     mod point_tests {
         use super::*;
 
@@ -248,16 +256,16 @@ mod tests {
         fn test_create_new_point() {
             let point = Point::new(1.6, 3.6);
 
-            assert_relative_eq!(point.x, 1.6, epsilon = 1e-6);
-            assert_relative_eq!(point.y, 3.6, epsilon = 1e-6);
+            assert_relative_eq!(point.x, 1.6, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point.y, 3.6, epsilon = TEST_EPSILON);
         }
 
         #[test]
         fn test_create_negative_point() {
             let point = Point::new(-2.3, -51.2);
 
-            assert_relative_eq!(point.x, -2.3, epsilon = 1e-6);
-            assert_relative_eq!(point.y, -51.2, epsilon = 1e-6);
+            assert_relative_eq!(point.x, -2.3, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point.y, -51.2, epsilon = TEST_EPSILON);
             assert!(point.x < 0.0);
             assert!(point.y < 0.0);
         }
@@ -266,8 +274,8 @@ mod tests {
         fn test_create_zero_point() {
             let point = Point::zero();
 
-            assert_relative_eq!(point.x, 0.0, epsilon = 1e-6);
-            assert_relative_eq!(point.y, 0.0, epsilon = 1e-6);
+            assert_relative_eq!(point.x, 0.0, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point.y, 0.0, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -275,8 +283,8 @@ mod tests {
             let point_1 = Point::new(1.6, 3.7);
             let point_2 = point_1;
 
-            assert_relative_eq!(point_1.x, point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -284,8 +292,18 @@ mod tests {
             let point_1 = Point::new(-1.5, 16.3);
             let point_2 = point_1.clone();
 
-            assert_relative_eq!(point_1.x, point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, point_2.y, epsilon = TEST_EPSILON);
+        }
+
+        #[test]
+        fn test_point_equality() {
+            let point = Point::new(1.0, 1.0);
+            let point_same = Point::new(1.0, 1.0);
+            let point_different = Point::new(1.6, 2.3);
+
+            assert_eq!(point, point_same);
+            assert_ne!(point, point_different);
         }
 
         #[test]
@@ -293,7 +311,7 @@ mod tests {
             let point_1 = Point::new(1.23, 23.1);
             let point_2 = point_1.clone();
 
-            assert_relative_eq!(point_1.distance_to(&point_2), 0.0, epsilon = 1e-6);
+            assert_relative_eq!(point_1.distance_to(&point_2), 0.0, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -301,7 +319,7 @@ mod tests {
             let point_1 = Point::new(-2.0, -1.5);
             let point_2 = Point::new(1.0, 2.5);
 
-            assert_relative_eq!(point_1.distance_to(&point_2), 5.0, epsilon = 1e-6);
+            assert_relative_eq!(point_1.distance_to(&point_2), 5.0, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -310,9 +328,8 @@ mod tests {
             let point_2 = Point::new(-2.3, -5.2);
 
             let added_point = point_1 + point_2;
-
-            assert_relative_eq!(added_point.x, point_1.x + point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(added_point.y, point_1.y + point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(added_point.x, point_1.x + point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(added_point.y, point_1.y + point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -324,8 +341,8 @@ mod tests {
 
             point_1 += point_2;
 
-            assert_relative_eq!(point_1.x, x_1 + point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, y_1 + point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, x_1 + point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, y_1 + point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -335,8 +352,16 @@ mod tests {
 
             let subtracted_point = point_1 - point_2;
 
-            assert_relative_eq!(subtracted_point.x, point_1.x - point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(subtracted_point.y, point_1.y - point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(
+                subtracted_point.x,
+                point_1.x - point_2.x,
+                epsilon = TEST_EPSILON
+            );
+            assert_relative_eq!(
+                subtracted_point.y,
+                point_1.y - point_2.y,
+                epsilon = TEST_EPSILON
+            );
         }
 
         #[test]
@@ -348,8 +373,8 @@ mod tests {
 
             point_1 -= point_2;
 
-            assert_relative_eq!(point_1.x, x_1 - point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, y_1 - point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, x_1 - point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, y_1 - point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -358,8 +383,16 @@ mod tests {
             let point_2 = Point::new(-2.3, -5.2);
             let multiplied_point = point_1 * point_2;
 
-            assert_relative_eq!(multiplied_point.x, point_1.x * point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(multiplied_point.y, point_1.y * point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(
+                multiplied_point.x,
+                point_1.x * point_2.x,
+                epsilon = TEST_EPSILON
+            );
+            assert_relative_eq!(
+                multiplied_point.y,
+                point_1.y * point_2.y,
+                epsilon = TEST_EPSILON
+            );
         }
 
         #[test]
@@ -371,8 +404,8 @@ mod tests {
 
             point_1 *= point_2;
 
-            assert_relative_eq!(point_1.x, x_1 * point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, y_1 * point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, x_1 * point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, y_1 * point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -382,8 +415,16 @@ mod tests {
 
             let divided_point = point_1 / point_2;
 
-            assert_relative_eq!(divided_point.x, point_1.x / point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(divided_point.y, point_1.y / point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(
+                divided_point.x,
+                point_1.x / point_2.x,
+                epsilon = TEST_EPSILON
+            );
+            assert_relative_eq!(
+                divided_point.y,
+                point_1.y / point_2.y,
+                epsilon = TEST_EPSILON
+            );
         }
 
         #[test]
@@ -395,8 +436,8 @@ mod tests {
 
             point_1 /= point_2;
 
-            assert_relative_eq!(point_1.x, x_1 / point_2.x, epsilon = 1e-6);
-            assert_relative_eq!(point_1.y, y_1 / point_2.y, epsilon = 1e-6);
+            assert_relative_eq!(point_1.x, x_1 / point_2.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(point_1.y, y_1 / point_2.y, epsilon = TEST_EPSILON);
         }
 
         #[test]
@@ -428,16 +469,44 @@ mod tests {
 
             let size = Size::new(width, height);
 
-            assert_relative_eq!(width, size.width, epsilon = 1e-6);
-            assert_relative_eq!(height, size.height, epsilon = 1e-6);
+            assert_relative_eq!(width, size.width, epsilon = TEST_EPSILON);
+            assert_relative_eq!(height, size.height, epsilon = TEST_EPSILON);
         }
 
         #[test]
         fn test_zero_size() {
             let zero_size = Size::zero();
 
-            assert_relative_eq!(zero_size.width, 0.0, epsilon = 1e-6);
-            assert_relative_eq!(zero_size.height, 0.0, epsilon = 1e-6);
+            assert_relative_eq!(zero_size.width, 0.0, epsilon = TEST_EPSILON);
+            assert_relative_eq!(zero_size.height, 0.0, epsilon = TEST_EPSILON);
+        }
+
+        #[test]
+        fn test_copy_size() {
+            let size_1 = Size::new(1.6, 3.7);
+            let size_2 = size_1;
+
+            assert_relative_eq!(size_1.width, size_2.width, epsilon = TEST_EPSILON);
+            assert_relative_eq!(size_1.height, size_2.height, epsilon = TEST_EPSILON);
+        }
+
+        #[test]
+        fn test_clone_size() {
+            let size_1 = Size::new(-1.5, 16.3);
+            let size_2 = size_1.clone();
+
+            assert_relative_eq!(size_1.width, size_2.width, epsilon = TEST_EPSILON);
+            assert_relative_eq!(size_1.height, size_2.height, epsilon = TEST_EPSILON);
+        }
+
+        #[test]
+        fn test_size_equality() {
+            let size = Size::new(1.0, 1.0);
+            let size_same = Size::new(1.0, 1.0);
+            let size_different = Size::new(1.6, 2.3);
+
+            assert_eq!(size, size_same);
+            assert_ne!(size, size_different);
         }
 
         #[test]
@@ -507,20 +576,46 @@ mod tests {
 
             let rect = Rect::new(pos.x, pos.y, size.width, size.height);
 
-            assert_relative_eq!(rect.pos.x, pos.x, epsilon = 1e-6);
-            assert_relative_eq!(rect.pos.y, pos.y, epsilon = 1e-6);
-            assert_relative_eq!(rect.size.width, size.width, epsilon = 1e-6);
-            assert_relative_eq!(rect.size.height, size.height, epsilon = 1e-6);
+            assert_relative_eq!(rect.pos.x, pos.x, epsilon = TEST_EPSILON);
+            assert_relative_eq!(rect.pos.y, pos.y, epsilon = TEST_EPSILON);
+            assert_relative_eq!(rect.size.width, size.width, epsilon = TEST_EPSILON);
+            assert_relative_eq!(rect.size.height, size.height, epsilon = TEST_EPSILON);
         }
 
         #[test]
         fn test_zero_rect_creation() {
             let zero_rect = Rect::zero();
 
-            assert_relative_eq!(zero_rect.pos.x, 0.0, epsilon = 1e-6);
-            assert_relative_eq!(zero_rect.pos.y, 0.0, epsilon = 1e-6);
-            assert_relative_eq!(zero_rect.size.width, 0.0, epsilon = 1e-6);
-            assert_relative_eq!(zero_rect.size.height, 0.0, epsilon = 1e-6);
+            assert_relative_eq!(zero_rect.pos.x, 0.0, epsilon = TEST_EPSILON);
+            assert_relative_eq!(zero_rect.pos.y, 0.0, epsilon = TEST_EPSILON);
+            assert_relative_eq!(zero_rect.size.width, 0.0, epsilon = TEST_EPSILON);
+            assert_relative_eq!(zero_rect.size.height, 0.0, epsilon = TEST_EPSILON);
+        }
+
+        #[test]
+        fn test_copy_rect() {
+            let rect_1 = Rect::new(1.6, 3.7, 10.0, 15.0);
+            let rect_2 = rect_1;
+
+            assert_eq!(rect_1, rect_2);
+        }
+
+        #[test]
+        fn test_clone_rect() {
+            let rect_1 = Rect::new(-1.5, 16.3, 19.9, 23.1);
+            let rect_2 = rect_1.clone();
+
+            assert_eq!(rect_1, rect_2);
+        }
+
+        #[test]
+        fn test_rect_equality() {
+            let rect = Rect::new(1.0, 1.0, 2.0, 2.0);
+            let rect_same = Rect::new(1.0, 1.0, 2.0, 2.0);
+            let rect_different = Rect::new(1.6, 2.3, 1.0, 1.0);
+
+            assert_eq!(rect, rect_same);
+            assert_ne!(rect, rect_different);
         }
 
         #[test]
@@ -568,7 +663,7 @@ mod tests {
             let rect = Rect::new(0.0, 0.0, 10.3, 175.3);
             let point_out_of_rect = Point::new(-1.0, -2.3);
 
-            assert_eq!(rect.contains_point(point_out_of_rect), false);
+            assert!(rect.contains_point(point_out_of_rect) == false);
         }
 
         #[test]
@@ -580,10 +675,10 @@ mod tests {
             let point_on_top_edge = Point::new(5.3, 0.0);
             let point_on_bottom_edge = Point::new(4.1, 175.3);
 
-            assert_eq!(rect.contains_point(point_on_left_edge), true);
-            assert_eq!(rect.contains_point(point_on_right_edge), true);
-            assert_eq!(rect.contains_point(point_on_top_edge), true);
-            assert_eq!(rect.contains_point(point_on_bottom_edge), true);
+            assert!(rect.contains_point(point_on_left_edge));
+            assert!(rect.contains_point(point_on_right_edge));
+            assert!(rect.contains_point(point_on_top_edge));
+            assert!(rect.contains_point(point_on_bottom_edge));
         }
 
         #[test]
@@ -592,7 +687,7 @@ mod tests {
 
             let point_inside_rect = Point::new(4.6, 36.3);
 
-            assert_eq!(rect.contains_point(point_inside_rect), true);
+            assert!(rect.contains_point(point_inside_rect));
         }
 
         #[test]
@@ -600,7 +695,7 @@ mod tests {
             let rect_1 = Rect::new(0.0, 0.0, 10.0, 10.0);
             let rect_2 = Rect::new(20.0, 20.0, 10.0, 10.0);
 
-            assert_eq!(rect_1.intersects(rect_2), false);
+            assert!(rect_1.intersects(rect_2) == false);
         }
 
         #[test]
@@ -611,10 +706,10 @@ mod tests {
             let rect_touch_top = Rect::new(2.0, -5.0, 5.0, 5.0);
             let rect_touch_bottom = Rect::new(2.0, 10.0, 5.0, 5.0);
 
-            assert_eq!(rect.intersects(rect_touch_left), true);
-            assert_eq!(rect.intersects(rect_touch_right), true);
-            assert_eq!(rect.intersects(rect_touch_top), true);
-            assert_eq!(rect.intersects(rect_touch_bottom), true);
+            assert!(rect.intersects(rect_touch_left));
+            assert!(rect.intersects(rect_touch_right));
+            assert!(rect.intersects(rect_touch_top));
+            assert!(rect.intersects(rect_touch_bottom));
         }
 
         #[test]
@@ -625,10 +720,10 @@ mod tests {
             let rect_crossed_top = Rect::new(2.0, -5.0, 5.0, 8.0);
             let rect_crossed_bottom = Rect::new(2.0, 8.0, 5.0, 5.0);
 
-            assert_eq!(rect.intersects(rect_crossed_left), true);
-            assert_eq!(rect.intersects(rect_crossed_right), true);
-            assert_eq!(rect.intersects(rect_crossed_top), true);
-            assert_eq!(rect.intersects(rect_crossed_bottom), true);
+            assert!(rect.intersects(rect_crossed_left));
+            assert!(rect.intersects(rect_crossed_right));
+            assert!(rect.intersects(rect_crossed_top));
+            assert!(rect.intersects(rect_crossed_bottom));
         }
 
         #[test]
@@ -636,7 +731,7 @@ mod tests {
             let smaller_rect = Rect::new(2.0, 2.0, 2.0, 2.0);
             let bigger_rect = Rect::new(0.0, 0.0, 10.0, 10.0);
 
-            assert_eq!(bigger_rect.intersects(smaller_rect), true);
+            assert!(bigger_rect.intersects(smaller_rect));
         }
 
         #[test]
@@ -644,7 +739,7 @@ mod tests {
             let smaller_rect = Rect::new(2.0, 2.0, 2.0, 2.0);
             let bigger_rect = Rect::new(0.0, 0.0, 10.0, 10.0);
 
-            assert_eq!(smaller_rect.intersects(bigger_rect), true);
+            assert!(smaller_rect.intersects(bigger_rect));
         }
 
         #[test]
@@ -654,8 +749,23 @@ mod tests {
             assert_relative_eq!(
                 rect.area(),
                 rect.size.width * rect.size.height,
-                epsilon = 1e-6
+                epsilon = TEST_EPSILON
             );
+        }
+    }
+
+    mod vec2_tests {
+        use super::*;
+
+        #[test]
+        fn test_point_moves_toward_vec2d() {
+            let point = Point::new(1.3, 2.3);
+            let vec_2d = Vec2::new(5.0, 5.0);
+
+            let moved_point = point + vec_2d;
+
+            assert_relative_eq!(moved_point.x, point.x + vec_2d.x);
+            assert_relative_eq!(moved_point.y, point.y + vec_2d.y);
         }
     }
 }
