@@ -17,8 +17,10 @@ fontdb = "0.16"
 rustybuzz = "0.12"
 glam = "0.25"
 
+
 [dev-dependencies]
 pollster = "0.3"
+approx = "0.5"
 
 # [[example]]
 # name = "hello_world"
