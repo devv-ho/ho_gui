@@ -243,7 +243,7 @@ impl Rect {
 pub type Vec2 = Point;
 
 #[cfg(test)]
-mod tests {
+mod math_tests {
     use super::*;
     use approx::assert_relative_eq;
 

@@ -6,13 +6,13 @@
 #![warn(missing_docs)]
 
 pub mod app;
+pub mod color;
 pub mod math;
-// pub mod color;
 // pub mod widgets;
 // pub mod layout;
 // pub mod rendering;
 // pub mod input;
-// pub mod style;
+pub mod style;
 
 // Re-export commonly used types
 // pub use app::App;
