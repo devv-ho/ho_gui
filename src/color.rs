@@ -268,7 +268,7 @@ impl Color {
     /// # Arguments
     ///
     /// * `hex` - The color hex &str (e.g. `"#FF1F00"`, `"#FF1F002A"`). The hex character is
-    /// case-insensitive. (e.g. `"#f1f1f1"`, `"#F1F1F1"`, `"#f1F1f1"` are all fine.)
+    ///   case-insensitive. (e.g. `"#f1f1f1"`, `"#F1F1F1"`, `"#f1F1f1"` are all fine.)
     ///
     /// # Returns
     ///
@@ -277,13 +277,13 @@ impl Color {
     /// # Errors
     ///
     /// * Returns `ColorParseError::InvalidLength` if the length of the input hex string is not 7 or
-    /// 9
+    ///   9
     ///
     /// * Returns `ColorParseError::InvalidFormat` if the input hex string doesn't start with `'#'`
-    /// (e.g. `"FF1F00"`)
+    ///   (e.g. `"FF1F00"`)
     ///
     /// * Returns `ColorParseError::InvalidCharacter` if the input hex string has non-hex character
-    /// (e.g. `'@'`, `'.'` ...)
+    ///   (e.g. `'@'`, `'.'` ...)
     ///
     /// # Examples
     /// ```
@@ -412,7 +412,7 @@ impl Color {
     /// assert!(clamped_color.is_valid());
     /// ```
     pub fn is_valid(&self) -> bool {
-        let check_validity = |x: f32| -> bool { !x.is_nan() && x >= 0.0 && x <= 1.0 };
+        let check_validity = |x: f32| -> bool { !x.is_nan() && (0.0..=1.0).contains(&x) };
 
         check_validity(self.r)
             && check_validity(self.g)
@@ -893,7 +893,7 @@ mod bench_tests {
     fn test_color_construction_performance() {
         // Use constant values to avoid measuring calculation overhead
         const ITERATIONS: usize = 100_000;
-        
+
         let start = std::time::Instant::now();
 
         for i in 0..ITERATIONS {
