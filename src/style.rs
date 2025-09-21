@@ -1,5 +1,7 @@
 //! Padding for rectangle, square components
 
+use crate::color::Color;
+
 /// Padding inside of rectangle, square components
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(C)]
@@ -266,6 +268,144 @@ impl Padding {
     }
 }
 
+/// Border property for UI components
+///
+/// # Notes
+///
+/// More properties (radius, dot-lined ...) will be supported in future release
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[repr(C)] // Memory layout consistency
+pub struct Border {
+    /// Border width
+    pub width: f32,
+
+    /// Border color
+    pub color: Color,
+}
+
+impl Border {
+    /// Create Border with givin width and color
+    ///
+    /// # Notes
+    ///
+    /// - width with `NaN` or negative value will be set to 0.0
+    /// - More properties (radius, dot-lined ...) will be supported in future release
+    ///
+    /// # Argumnents
+    ///
+    /// * `width` - Border line width
+    /// * `color` - Border line color
+    ///
+    /// # Returns
+    ///
+    /// Returns Border { width: width, color: color }
+    ///
+    /// # Examples
+    /// ```
+    /// use ho_gui::style::Border;
+    /// use ho_gui::color::Color;
+    ///
+    /// let valid_border = Border::new(1.0, Color::BLACK);
+    /// let negative_border = Border::new(-1.0, Color::from_hex(0x00_FF_00));
+    /// let nan_border = Border::new(f32::NAN, Color::from_hex_str("#FF00FF00"));
+    ///
+    /// // valid width should remain unchanged
+    /// assert_eq!(
+    ///     (valid_border.width, valid_border.color),
+    ///     (1.0, Color::BLACK),
+    /// );
+    ///
+    /// // negative width should clamp to 0.0
+    /// assert_eq!(
+    ///     (negative_border.width, negative_border.color),
+    ///     (0.0, Color::from_hex(0x00_FF_00),
+    /// );
+    ///
+    /// // nan width should clamp to 0.0
+    /// assert_eq!(
+    ///     (nan_border.width, nan_border.color),
+    ///     (0.0, Color::from_hex_str("#FF00FF00")),
+    /// );
+    /// ```
+    pub const fn new(width: f32, color: Color) -> Self {
+        let width = Self::to_valid(width);
+        Self { width, color }
+    }
+
+    /// Create empty, transparent border
+    ///
+    /// # Returns
+    ///
+    /// Returns Border { width: 0.0, color: Color::TRANSPARENT }
+    ///
+    /// # Examples
+    /// ```
+    /// use ho_gui::style::Border;
+    /// use ho_gui::color::Color;
+    ///
+    /// let empty_border = Border::none();
+    ///
+    /// assert_eq!(
+    ///     (empty_border.width, empty_border.color),
+    ///     (0.0, Color::TRANSPARENT),
+    /// );
+    /// ```
+    pub const fn none() -> Self {
+        Self::new(0.0, Color::TRANSPARENT)
+    }
+
+    /// Create Border with givin width and color
+    ///
+    /// # Notes
+    ///
+    /// - It behaves just as same as Border::new()
+    /// - Width with `NaN` or negative value will be set to 0.0
+    /// - More properties (radius, dot-lined ...) will be supported in future release
+    ///
+    /// # Argumnents
+    ///
+    /// * `width` - Border line width
+    /// * `color` - Border line color
+    ///
+    /// # Returns
+    ///
+    /// Returns Border { width: width, color: color }
+    ///
+    /// # Examples
+    /// ```
+    /// use ho_gui::style::Border;
+    /// use ho_gui::color::Color;
+    ///
+    /// let valid_border = Border::solid(1.0, Color::BLACK);
+    /// let negative_border = Border::solid(-1.0, Color::from_hex(0x00_FF_00));
+    /// let nan_border = Border::solid(f32::NAN, Color::from_hex_str("#FF00FF00"));
+    ///
+    /// // valid width should remain unchanged
+    /// assert_eq!(
+    ///     (valid_border.width, valid_border.color),
+    ///     (1.0, Color::BLACK),
+    /// );
+    ///
+    /// // negative width should clamp to 0.0
+    /// assert_eq!(
+    ///     (negative_border.width, negative_border.color),
+    ///     (0.0, Color::from_hex(0x00_FF_00),
+    /// );
+    ///
+    /// // nan width should clamp to 0.0
+    /// assert_eq!(
+    ///     (nan_border.width, nan_border.color),
+    ///     (0.0, Color::from_hex_str("#FF00FF00")),
+    /// );
+    /// ```
+    pub const fn solid(width: f32, color: Color) -> Self {
+        Self::new(width, color)
+    }
+
+    const fn to_valid(x: f32) -> f32 {
+        if x.is_nan() || x < 0.0 { 0.0 } else { x }
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
