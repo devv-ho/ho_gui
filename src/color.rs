@@ -333,21 +333,6 @@ impl Color {
     /// ```
     /// use ho_gui::color::Color;
     ///
-    /// Get u8 hex value of each RGBA values.
-    ///
-    /// # Note
-    ///
-    /// Uses manual rounding implementation for const fn compatibility.
-    /// Adds 0.5 and truncates for proper rounding behavior.
-    ///
-    /// # Returns
-    ///
-    /// A tuple `(r, g, b, a)` where each component is a `u8` in the range `0..=255`.
-    ///
-    /// # Examples
-    /// ```
-    /// use ho_gui::color::Color;
-    ///
     /// let white = Color::WHITE;
     /// let (r, g, b, a) = white.to_rgba_u8();
     /// assert_eq!((r, g, b, a), (0xFF, 0xFF, 0xFF, 0xFF));
@@ -906,16 +891,15 @@ mod bench_tests {
     // Simple benchmark-style tests (for actual benchmarking, use criterion crate)
     #[test]
     fn test_color_construction_performance() {
-        let start = std::time::Instant::now();
+        // Use constant values to avoid measuring calculation overhead
         const ITERATIONS: usize = 100_000;
+        
+        let start = std::time::Instant::now();
 
         for i in 0..ITERATIONS {
-            let r = (i % 256) as f32 / 255.0;
-            let g = ((i * 2) % 256) as f32 / 255.0;
-            let b = ((i * 3) % 256) as f32 / 255.0;
-            let a = ((i * 4) % 256) as f32 / 255.0;
-
-            let _color = Color::new(r, g, b, a);
+            // Use simple, deterministic values that don't require calculation
+            let val = (i & 0xFF) as f32 / 255.0;
+            let _color = Color::new(val, val, val, 1.0);
         }
 
         let elapsed = start.elapsed();
