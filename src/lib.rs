@@ -6,8 +6,8 @@
 #![warn(missing_docs)]
 
 pub mod app;
+pub mod color;
 pub mod math;
-// pub mod color;
 // pub mod widgets;
 // pub mod layout;
 // pub mod rendering;
