@@ -12,7 +12,7 @@ pub mod math;
 // pub mod layout;
 // pub mod rendering;
 // pub mod input;
-// pub mod style;
+pub mod style;
 
 // Re-export commonly used types
 // pub use app::App;

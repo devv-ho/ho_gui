@@ -8,12 +8,14 @@ This documentation is split across multiple files to ensure readability. When as
 1. **Start here** - `PROJECT_ARCHITECTURE.md` (this file) - Overview and navigation
 2. **Core modules** - `docs/MATH_MODULE.md` - Point, Size, Rect, Vec2 implementation
 3. **Color system** - `docs/COLOR_MODULE.md` - RGBA color with GPU optimization
-4. **Quick reference** - Use section headers to jump to specific topics
+4. **Style system** - `docs/STYLE_MODULE.md` - Padding, Border, layout primitives
+5. **Quick reference** - Use section headers to jump to specific topics
 
 ### Information Lookup Strategy
 - **Architecture questions** → This file (overview, principles, dependencies)
 - **Math operations** → `docs/MATH_MODULE.md` (Point, Rect, geometric operations)
 - **Color handling** → `docs/COLOR_MODULE.md` (RGBA, hex parsing, GPU layout)
+- **Style/Layout** → `docs/STYLE_MODULE.md` (Padding, Border, layout primitives)
 - **Performance concerns** → Search for "Performance" in relevant module docs
 - **Testing patterns** → Search for "Testing" in module-specific files
 
@@ -69,6 +71,12 @@ Ho GUI is an immediate-mode GUI library for Rust, designed for building general 
 - Saturating clamp strategy and NaN handling
 - Const function implementation and performance benchmarks
 
+### Style Module → [`docs/STYLE_MODULE.md`](docs/STYLE_MODULE.md)
+- Padding and Border implementation with validation and const functions
+- Layout primitives for UI spacing, positioning, and visual separation
+- GPU-compatible memory layouts for styling data
+- Complete Task 1.2.2 implementation with performance benchmarks
+
 ---
 
 ## Module Dependencies
@@ -76,10 +84,21 @@ Ho GUI is an immediate-mode GUI library for Rust, designed for building general 
 ```
 src/lib.rs
 ├── color     (no dependencies)
-└── math      (no dependencies) 
+├── math      (no dependencies)
+└── style     (depends on color for Border implementation)
 ```
 
-Both modules are standalone with no external dependencies except for testing (`approx` crate for float comparisons).
+**Dependency Analysis:**
+- **color**: Standalone with no dependencies
+- **math**: Standalone with no dependencies  
+- **style**: Depends on color module for Border type
+- **Testing**: All modules use `approx` crate for float comparisons
+
+**Import Structure:**
+```rust
+// src/style.rs
+use crate::color::Color;  // Border requires Color dependency
+```
 
 ---
 
