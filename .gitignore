@@ -16,9 +16,6 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Documentation build
-/doc/
-
 # Coverage reports
 *.profraw
 tarpaulin-report.html
