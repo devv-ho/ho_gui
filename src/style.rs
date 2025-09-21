@@ -284,14 +284,14 @@ pub struct Border {
 }
 
 impl Border {
-    /// Create Border with givin width and color
+    /// Create Border with given width and color
     ///
     /// # Notes
     ///
     /// - width with `NaN` or negative value will be set to 0.0
     /// - More properties (radius, dot-lined ...) will be supported in future release
     ///
-    /// # Argumnents
+    /// # Arguments
     ///
     /// * `width` - Border line width
     /// * `color` - Border line color
@@ -307,7 +307,7 @@ impl Border {
     ///
     /// let valid_border = Border::new(1.0, Color::BLACK);
     /// let negative_border = Border::new(-1.0, Color::from_hex(0x00_FF_00));
-    /// let nan_border = Border::new(f32::NAN, Color::from_hex_str("#FF00FF00"));
+    /// let nan_border = Border::new(f32::NAN, Color::from_hex_str("#FF00FF00").unwrap());
     ///
     /// // valid width should remain unchanged
     /// assert_eq!(
@@ -318,13 +318,13 @@ impl Border {
     /// // negative width should clamp to 0.0
     /// assert_eq!(
     ///     (negative_border.width, negative_border.color),
-    ///     (0.0, Color::from_hex(0x00_FF_00),
+    ///     (0.0, Color::from_hex(0x00_FF_00)),
     /// );
     ///
     /// // nan width should clamp to 0.0
     /// assert_eq!(
     ///     (nan_border.width, nan_border.color),
-    ///     (0.0, Color::from_hex_str("#FF00FF00")),
+    ///     (0.0, Color::from_hex_str("#FF00FF00").unwrap()),
     /// );
     /// ```
     pub const fn new(width: f32, color: Color) -> Self {
@@ -354,7 +354,7 @@ impl Border {
         Self::new(0.0, Color::TRANSPARENT)
     }
 
-    /// Create Border with givin width and color
+    /// Create Border with given width and color
     ///
     /// # Notes
     ///
@@ -362,7 +362,7 @@ impl Border {
     /// - Width with `NaN` or negative value will be set to 0.0
     /// - More properties (radius, dot-lined ...) will be supported in future release
     ///
-    /// # Argumnents
+    /// # Arguments
     ///
     /// * `width` - Border line width
     /// * `color` - Border line color
@@ -378,7 +378,7 @@ impl Border {
     ///
     /// let valid_border = Border::solid(1.0, Color::BLACK);
     /// let negative_border = Border::solid(-1.0, Color::from_hex(0x00_FF_00));
-    /// let nan_border = Border::solid(f32::NAN, Color::from_hex_str("#FF00FF00"));
+    /// let nan_border = Border::solid(f32::NAN, Color::from_hex_str("#FF00FF00").unwrap());
     ///
     /// // valid width should remain unchanged
     /// assert_eq!(
@@ -389,13 +389,13 @@ impl Border {
     /// // negative width should clamp to 0.0
     /// assert_eq!(
     ///     (negative_border.width, negative_border.color),
-    ///     (0.0, Color::from_hex(0x00_FF_00),
+    ///     (0.0, Color::from_hex(0x00_FF_00)),
     /// );
     ///
     /// // nan width should clamp to 0.0
     /// assert_eq!(
     ///     (nan_border.width, nan_border.color),
-    ///     (0.0, Color::from_hex_str("#FF00FF00")),
+    ///     (0.0, Color::from_hex_str("#FF00FF00").unwrap()),
     /// );
     /// ```
     pub const fn solid(width: f32, color: Color) -> Self {
@@ -406,6 +406,7 @@ impl Border {
         if x.is_nan() || x < 0.0 { 0.0 } else { x }
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -644,5 +645,274 @@ mod tests {
             assert_eq!(CONST_PAD.left, 1.0);
             assert_eq!(CONST_ALL.left, 5.0);
         }
+    }
+
+    mod border {
+        use super::*;
+
+        #[test]
+        fn test_new_valid_and_invalid_width() {
+            let valid = Border::new(1.0, Color::BLACK);
+            let invalid_negative = Border::new(-1.0, Color::TRANSPARENT);
+            let invalid_nan = Border::new(f32::NAN, Color::BLUE);
+
+            assert_eq!(
+                valid.width, 1.0,
+                "Valid width should remain unchanged. width: {}",
+                valid.width
+            );
+
+            assert_eq!(
+                valid.color,
+                Color::BLACK,
+                "Color should remain unchanged. color: {:?}",
+                valid.color
+            );
+
+            assert_eq!(
+                invalid_negative.width, 0.0,
+                "Negative width should be set to 0.0. width: {}",
+                invalid_negative.width
+            );
+
+            assert_eq!(
+                invalid_negative.color,
+                Color::TRANSPARENT,
+                "Color should remain unchanged. color: {:?}",
+                invalid_negative.color
+            );
+
+            assert_eq!(
+                invalid_nan.width, 0.0,
+                "NaN width should be set to 0.0. width: {}",
+                invalid_nan.width
+            );
+
+            assert_eq!(
+                invalid_nan.color,
+                Color::BLUE,
+                "Color should remain unchanged. color: {:?}",
+                invalid_nan.color
+            );
+        }
+
+        #[test]
+        fn test_none() {
+            let none = Border::none();
+
+            assert_eq!(
+                none.width, 0.0,
+                "Border None should have width 0.0. width: {}",
+                none.width
+            );
+            assert_eq!(
+                none.color,
+                Color::TRANSPARENT,
+                "Border None should be transparent. color: {:?}",
+                none.color
+            );
+        }
+
+        #[test]
+        fn test_solid_valid_and_invalid_width() {
+            let valid = Border::solid(1.0, Color::BLACK);
+            let invalid_negative = Border::solid(-1.0, Color::TRANSPARENT);
+            let invalid_nan = Border::solid(f32::NAN, Color::BLUE);
+
+            assert_eq!(
+                valid.width, 1.0,
+                "Valid width should remain unchanged. width: {}",
+                valid.width
+            );
+
+            assert_eq!(
+                valid.color,
+                Color::BLACK,
+                "Color should remain unchanged. color: {:?}",
+                valid.color
+            );
+
+            assert_eq!(
+                invalid_negative.width, 0.0,
+                "Negative width should be set to 0.0. width: {}",
+                invalid_negative.width
+            );
+
+            assert_eq!(
+                invalid_negative.color,
+                Color::TRANSPARENT,
+                "Color should remain unchanged. color: {:?}",
+                invalid_negative.color
+            );
+
+            assert_eq!(
+                invalid_nan.width, 0.0,
+                "NaN width should be set to 0.0. width: {}",
+                invalid_nan.width
+            );
+
+            assert_eq!(
+                invalid_nan.color,
+                Color::BLUE,
+                "Color should remain unchanged. color: {:?}",
+                invalid_nan.color
+            );
+        }
+
+        #[test]
+        fn test_const_functions() {
+            // const fn이 컴파일 타임에 동작하는지 확인
+            const CONST_BORDER: Border = Border::new(2.0, Color::RED);
+            const CONST_NONE: Border = Border::none();
+            const CONST_SOLID: Border = Border::solid(3.0, Color::BLUE);
+
+            assert_eq!(CONST_BORDER.width, 2.0);
+            assert_eq!(CONST_BORDER.color, Color::RED);
+            assert_eq!(CONST_NONE.width, 0.0);
+            assert_eq!(CONST_NONE.color, Color::TRANSPARENT);
+            assert_eq!(CONST_SOLID.width, 3.0);
+            assert_eq!(CONST_SOLID.color, Color::BLUE);
+        }
+    }
+}
+
+#[cfg(test)]
+mod bench_tests {
+    use super::*;
+
+    // Simple benchmark-style tests (for actual benchmarking, use criterion crate)
+    #[test]
+    fn test_padding_construction_performance() {
+        let start = std::time::Instant::now();
+        const ITERATIONS: usize = 100_000;
+
+        for i in 0..ITERATIONS {
+            let value = (i % 1000) as f32 / 10.0;
+            let _padding = Padding::new(value, value * 1.1, value * 1.2, value * 1.3);
+        }
+
+        let elapsed = start.elapsed();
+        let ns_per_op = elapsed.as_nanos() as f64 / ITERATIONS as f64;
+
+        println!("Padding::new() performance: {:.2}ns per operation", ns_per_op);
+        assert!(
+            ns_per_op < 50.0,
+            "Performance regression: {}ns > 50ns",
+            ns_per_op
+        );
+    }
+
+    #[test]
+    fn test_padding_convenience_constructors_performance() {
+        let start = std::time::Instant::now();
+        const ITERATIONS: usize = 100_000;
+
+        for i in 0..ITERATIONS {
+            let value = (i % 1000) as f32 / 10.0;
+            let _all = Padding::all(value);
+            let _horizontal = Padding::horizontal(value);
+            let _vertical = Padding::vertical(value);
+            let _symmetric = Padding::symmetric(value, value * 2.0);
+        }
+
+        let elapsed = start.elapsed();
+        let ns_per_op = elapsed.as_nanos() as f64 / (ITERATIONS * 4) as f64;
+
+        println!("Padding convenience constructors performance: {:.2}ns per operation", ns_per_op);
+        assert!(
+            ns_per_op < 50.0,
+            "Performance regression: {}ns > 50ns",
+            ns_per_op
+        );
+    }
+
+    #[test]
+    fn test_border_construction_performance() {
+        let start = std::time::Instant::now();
+        const ITERATIONS: usize = 100_000;
+
+        for i in 0..ITERATIONS {
+            let width = (i % 100) as f32 / 10.0;
+            let color = Color::rgb((i % 256) as f32 / 255.0, 0.5, 0.8);
+            let _border = Border::new(width, color);
+        }
+
+        let elapsed = start.elapsed();
+        let ns_per_op = elapsed.as_nanos() as f64 / ITERATIONS as f64;
+
+        println!("Border::new() performance: {:.2}ns per operation", ns_per_op);
+        assert!(
+            ns_per_op < 50.0,
+            "Performance regression: {}ns > 50ns",
+            ns_per_op
+        );
+    }
+
+    #[test]
+    fn test_border_convenience_constructors_performance() {
+        let start = std::time::Instant::now();
+        const ITERATIONS: usize = 100_000;
+
+        for i in 0..ITERATIONS {
+            let width = (i % 100) as f32 / 10.0;
+            let color = Color::from_hex((i % 0xFFFFFF) as u32);
+            let _solid = Border::solid(width, color);
+            let _none = Border::none();
+        }
+
+        let elapsed = start.elapsed();
+        let ns_per_op = elapsed.as_nanos() as f64 / (ITERATIONS * 2) as f64;
+
+        println!("Border convenience constructors performance: {:.2}ns per operation", ns_per_op);
+        assert!(
+            ns_per_op < 50.0,
+            "Performance regression: {}ns > 50ns",
+            ns_per_op
+        );
+    }
+
+    #[test]
+    fn test_memory_layout_verification() {
+        // Verify memory layout for GPU compatibility
+        assert_eq!(std::mem::size_of::<Padding>(), 16);
+        assert_eq!(std::mem::align_of::<Padding>(), 4);
+
+        // Border has Color (16 bytes, 16-byte aligned) + f32 (4 bytes) + padding (12 bytes)
+        // Total: 32 bytes due to Color's 16-byte alignment requirement
+        assert_eq!(std::mem::size_of::<Border>(), 32);
+        assert_eq!(std::mem::align_of::<Border>(), 16);
+
+        println!("Padding: {} bytes, {} byte alignment", 
+                std::mem::size_of::<Padding>(), 
+                std::mem::align_of::<Padding>());
+        println!("Border: {} bytes, {} byte alignment", 
+                std::mem::size_of::<Border>(), 
+                std::mem::align_of::<Border>());
+    }
+
+    #[test]
+    fn test_const_evaluation_performance() {
+        // Verify const functions work at compile time (zero runtime cost)
+        const _CONST_PADDING: Padding = Padding::symmetric(16.0, 8.0);
+        const _CONST_BORDER: Border = Border::solid(2.0, Color::BLACK);
+        
+        // These should have zero runtime cost
+        let start = std::time::Instant::now();
+        const ITERATIONS: usize = 100_000;
+
+        for _ in 0..ITERATIONS {
+            let _padding = _CONST_PADDING;
+            let _border = _CONST_BORDER;
+        }
+
+        let elapsed = start.elapsed();
+        let ns_per_op = elapsed.as_nanos() as f64 / (ITERATIONS * 2) as f64;
+
+        println!("Const value access performance: {:.2}ns per operation", ns_per_op);
+        assert!(
+            ns_per_op < 10.0,
+            "Const evaluation should be near-zero cost: {}ns > 10ns",
+            ns_per_op
+        );
     }
 }
